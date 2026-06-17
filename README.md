@@ -28,7 +28,7 @@ The canonical scaled dot-product attention mechanism relies on a fixed softmax o
 A comprehensive diagram outlining the internal tensor operations and layer-wise interactions is located at `assets/architecture_diagram.png`.
 
 ### Methodological Rigor and Open Science
-In alignment with the principles of reproducible machine learning research, this project explicitly presents **mixed findings**. While $A^3$ uncovers targeted representational benefits in specialized task environments—such as long-sequence context windows—it does not consistently outperform a carefully tuned, parameter-matched baseline configuration across all standard natural language benchmarks (e.g., typical BERT-scale token environments). Full analytical details are presented in the [Empirical Benchmarks](#4-empirical-benchmarks) section below.
+In alignment with the principles of reproducible machine learning research, this project explicitly presents **mixed findings**. While $A^3$ uncovers targeted representational benefits in specialized task environments-such as long-sequence context windows-it does not consistently outperform a carefully tuned, parameter-matched baseline configuration across all standard natural language benchmarks (e.g., typical BERT-scale token environments). Full analytical details are presented in the [Empirical Benchmarks](#4-empirical-benchmarks) section below.
 
 ---
 
