@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use this software or build on this study, please cite it as below."
+title: "A3: Adaptive Activation Attention - An Empirical Investigation with Mixed Findings"
+authors:
+  - family-names: "Farooq"
+    given-names: "Muhammad Maroof"
+    email: "maroof96965@gmail.com"
+date-released: 2026-04-01
+version: "1.0.0"
+license: MIT
+repository-code: "https://github.com/maroofiums/A3-Attention"
+preferred-citation:
+  type: generic
+  title: "Is Learnable Attention Normalization Beneficial? An Empirical Investigation with Mixed Findings"
+  authors:
+    - family-names: "Farooq"
+      given-names: "Muhammad Maroof"
+  year: 2026
+  notes: "Workshop submission, under review"
