@@ -12,7 +12,7 @@ This repository contains the official PyTorch implementation and empirical evalu
 
 ### Core Research Metadata
 * **Paper Title:** [Is Learnable Attention Normalization Beneficial? An Empirical Investigation with Mixed Findings](https://zenodo.org/records/20364414)
-* **Author:** Muhammad Maroof Farooq (Authentik Track and Trace, Karachi, Pakistan)
+* **Author:** Muhammad Maroof Farooq 
 * **Date:** April 2026
 * **Manuscript Document:** `paper/a3_paper.pdf`
 * **Status:** Workshop submission, under review
