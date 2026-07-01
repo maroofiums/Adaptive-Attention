@@ -25,31 +25,85 @@ The canonical scaled dot-product attention mechanism relies on a fixed softmax o
 
 **Adaptive Activation Attention ($A^3$)** addresses this by modeling attention normalization via a lightweight, gated sub-network. This network accepts the raw score distribution, positional identifiers, and layer-specific state vectors as inputs, dynamically mapping similarity values to valid attention weights that strictly satisfy non-negativity and row-stochastic (summation-to-one) boundaries.
 
-A comprehensive diagram outlining the internal tensor operations and layer-wise interactions is located at `assets/architecture_diagram.png`.
-
 ### Methodological Rigor and Open Science
-In alignment with the principles of reproducible machine learning research, this project explicitly presents **mixed findings**. While $A^3$ uncovers targeted representational benefits in specialized task environments-such as long-sequence context windows-it does not consistently outperform a carefully tuned, parameter-matched baseline configuration across all standard natural language benchmarks (e.g., typical BERT-scale token environments). Full analytical details are presented in the [Empirical Benchmarks](#4-empirical-benchmarks) section below.
+In alignment with the principles of reproducible machine learning research, this project explicitly presents **mixed findings**. While $A^3$ uncovers targeted representational benefits in specialized task environments—such as long-sequence context windows—it does not consistently outperform a carefully tuned, parameter-matched baseline configuration across all standard natural language benchmarks (e.g., typical BERT-scale token environments). Full analytical details are presented in the [Empirical Benchmarks](#4-empirical-benchmarks) section below.
 
 ---
 
-## 2. Supported Attention Modes
+## 2. Model Architecture
+
+```mermaid
+graph TD
+    %% Score Computation Subgraph
+    subgraph Score_Computation [Score Computation]
+        In_QKV["Q, K, V"] --> Score_Calc["S = Q Kᵀ / √dₖ"]
+        Score_Calc --> Gated_Score["S ⊙ G + B"]
+    end
+
+    %% Input-Conditioning Context
+    subgraph Context_Block [Input Conditioning]
+        Context_Vec["c = [ Q̄ ; K̄ ; e(l, h) ]<br><i>context vector</i>"]
+    end
+
+    %% Learnable Gate / Bias Networks
+    subgraph Gating_Network [Learnable Gate & Bias Networks]
+        Gate_Net["g = σ(W_g · c)<br><i>gate (0,1)</i>"]
+        Bias_Net["B = U · cᵀ<br><i>low-rank bias</i>"]
+    end
+
+    %% Normalization & Output
+    subgraph Normalization_Block [Normalization & Output]
+        Gated_Score --> Softmax_Op["softmax(·)<br><i>(validity guaranteed)</i>"]
+        Softmax_Op --> Out_Block["Attn · V"]
+    end
+
+    %% Inter-block connections
+    Context_Vec --> Gate_Net
+    Gate_Net --> Bias_Net
+    Gate_Net -->|"G"| Gated_Score
+    Bias_Net -->|"B"| Gated_Score
+
+    %% Styling configurations
+    style In_QKV fill:#d1e8ff,stroke:#1e88e5,stroke-width:2px,color:#000
+    style Score_Calc fill:#d1e8ff,stroke:#1e88e5,stroke-width:2px,color:#000
+    style Gated_Score fill:#d1e8ff,stroke:#1e88e5,stroke-width:2px,color:#000
+    
+    style Context_Vec fill:#ffe0b2,stroke:#f57c00,stroke-width:2px,color:#000
+    
+    style Gate_Net fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,color:#000
+    style Bias_Net fill:#fff9c4,stroke:#fbc02d,stroke-width:2px,color:#000
+    
+    style Softmax_Op fill:#ffcdd2,stroke:#e53935,stroke-width:2px,color:#000
+    style Out_Block fill:#c8e6c9,stroke:#43a047,stroke-width:2px,color:#000
+
+    classDef default font-family:sans-serif,font-size:12px;
+
+```
+
+> **Proposition 1 (Validity):** For any $\theta$, softmax guarantees non-negative weights that sum to 1 per row.
+> **Proposition 2 (Softmax recovery):** Default initialization makes the model behave like standard softmax at the start of training.
+
+---
+
+## 3. Supported Attention Modes
 
 The core library located inside `src/a3_attention.py` includes **four operational attention variants** used for comparative structural evaluation:
 
 * **`softmax`**
-  Standard PyTorch Scaled Dot-Product Attention functioning as the architectural control baseline.
+Standard PyTorch Scaled Dot-Product Attention functioning as the architectural control baseline.
 * **`a3_gated`**
-  The baseline $A^3$ framework, which feeds the underlying score matrices through an input-conditioned gated transformation to generate contextual weights.
+The baseline $A^3$ framework, which feeds the underlying score matrices through an input-conditioned gated transformation to generate contextual weights.
 * **`a3_residual`**
-  An experimental mode applying a learnable, context-dependent adjustment mapping as a structured residual bypass over a traditional softmax framework.
+An experimental mode applying a learnable, context-dependent adjustment mapping as a structured residual bypass over a traditional softmax framework.
 * **`a3_learned_baseline`**
-  A parameter-matched control mode where layer and head normalization values are static throughout evaluation. They are updated globally via backpropagation but do not condition dynamically on specific token sequences at runtime.
+A parameter-matched control mode where layer and head normalization values are static throughout evaluation. They are updated globally via backpropagation but do not condition dynamically on specific token sequences at runtime.
 
 ---
 
-## 3. Installation & Usage
+## 4. Installation & Usage
 
 ### Setup Environment
+
 Clone the repository workspace and install all runtime and development requirements using `requirements.txt`:
 
 ```bash
@@ -99,7 +153,7 @@ print("Attention weights shape:", attention_weights.shape)  # Expected: torch.Si
 
 ---
 
-## 4. Empirical Benchmarks
+## 5. Empirical Benchmarks
 
 Performance testing incorporates paired bootstrap resampling utilizing 10,000 unique iterations to accurately quantify statistical variance and cross-run trends.
 
@@ -117,7 +171,7 @@ Performance testing incorporates paired bootstrap resampling utilizing 10,000 un
 
 ---
 
-## 5. Verification Suite
+## 6. Verification Suite
 
 Code validation is managed through an integrated testing setup designed to confirm specific architectural invariants. The system contains **40 automated unit tests** tracking output matrix shapes, non-negativity parameters, row-stochastic bounds, and stable, non-NaN gradient execution paths.
 
@@ -144,7 +198,7 @@ jupyter notebook notebooks/A3_Adaptive_Attention.ipynb
 
 ---
 
-## 6. Contribution Guidelines
+## 7. Contribution Guidelines
 
 Contributions focusing on scaling validations up to large model topologies or highlighting architectural edge cases are welcome.
 
@@ -156,9 +210,14 @@ Please read `CONTRIBUTING.md` before initiating a Pull Request. Current developm
 
 ---
 
-## 7. License
+## 8. License
 
 This project is licensed under the conditions of the **MIT License**. For granular specifications, view the terms in `LICENSE`.
 
 ---
 
+## 9. Acknowledgements
+
+* PyTorch
+* Hugging Face Transformers
+* SCROLLS and GLUE Benchmarks
