@@ -80,7 +80,7 @@ graph TD
 
 ```
 
-> **Proposition 1 (Validity):** For any $\theta$, softmax guarantees non-negative weights that sum to 1 per row.
+> **Proposition 1 (Validity):** For any $\theta$, softmax guarantees non-negative weights that sum to 1 per row.<br>
 > **Proposition 2 (Softmax recovery):** Default initialization makes the model behave like standard softmax at the start of training.
 
 ---
